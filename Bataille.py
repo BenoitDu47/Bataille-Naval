@@ -41,16 +41,16 @@ shots = []
 # Fonction pour initialiser et afficher la grille
 def display_grid(grid):
     # Afficher la ligne supérieure
-    print("+---" * (GRID_SIZE + 1) + "+")
+    print("----" * (GRID_SIZE + 1) + "-")
 
     # Afficher la grille
     print("|    | " + " | ".join(LETTERS) + " |")
-    print("+---" * (GRID_SIZE + 1) + "+")
+    print("----" * (GRID_SIZE + 1) + "-")
 
     for i, row in enumerate(grid):
         line = "| " + str(i + 1).rjust(2) + " | " + " | ".join(row) + " |"
         print(line)
-        print("+---" * (GRID_SIZE + 1) + "+")
+        print("----" * (GRID_SIZE + 1) + "-")
 
 # Afficher la grille initiale
 initial_grid = [[Back.BLUE + " " + Back.RESET for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
