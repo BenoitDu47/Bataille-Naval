@@ -1,78 +1,93 @@
-#!/usr/bin/env python
-#  -*- coding: utf-8 -*-
+from colorama import Back, Fore, Style, init
 
-# la grille de jeu virtuelle est composée de 10 x 10 cases
-# une case est identifiée par ses coordonnées (no ligne, no colonne),
-# mais pour le joueur une colonne sera identifiée par une lettre (de 'A' à 'J')
+# ip install colorama
 
+# Initialisation de colorama
+init(autoreset=True)
+
+# Initialisation de la grille et des navires
 GRID_SIZE = 10
-
-# détermination de la liste des lettres utilisées pour identifier les colonnes :
 LETTERS = "ABCDEFGHIJ"
 
-# chaque navire est constitué d'une structure de données permettant de
-# connaitre l'état (intact ou touché) de chaque partie (case)
-# du navire le constituant
+# Définissez l'état initial des navires
+aircraft_carrier = [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6)]
+cruiser = [(3, 1), (3, 2), (3, 3)]
+destroyer = [(4, 2), (4, 3), (4, 4)]
+submarine = [(5, 7), (6, 7), (7, 7)]
+torpedo_boat = [(8, 4), (8, 5)]
 
-# les navires suivants sont disposés de façon fixe dans la grille :
-#      +---+---+---+---+---+---+---+---+---+---+
-#      | A | B | C | D | E | F | G | H | I | J |
-#      +---+---+---+---+---+---+---+---+---+---+
-#      | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10|
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  1 |   |   |   |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  2 |   | o | X | o | o | o |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  3 |   |   |   |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  4 | o |   |   |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  5 | o |   | o |   |   |   |   | o | o | o |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  6 | o |   | o |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  7 | o |   | o |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  8 |   |   |   |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# |  9 |   |   |   |   | o | o |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-# | 10 |   |   |   |   |   |   |   |   |   |   |
-# +----+---+---+---+---+---+---+---+---+---+---+
-aircraft_carrier = None  # porte_avion en B2
-aircraft_carrier_safe =     ['B2', 'C2', 'D2', 'E2', 'F2']
-aircraft_carrier_after_c2 = ['B2',       'D2', 'E2', 'F2']
-aircraft_carrier_after_c2 = ['B2', 'X', 'D2', 'E2', 'F2']
-
-aircraft_carrier_safe =     {'B2', 'C2', 'D2', 'E2', 'F2'}
-aircraft_carrier_after_c2 = {'B2',       'D2', 'E2', 'F2'}
-aircraft_carrier_after_c2 = {'B2', 'X', 'D2', 'E2', 'F2'}
-
-aircraft_carrier_safe =\
-    [(2, 2, True), (2, 3, True), (2, 4, True), (2, 5, True), (2, 6, True)]
-aircraft_carrier_after_c2 =\
-    [(2, 2, True), (2, 3, False), (2, 4, True), (2, 5, True), (2, 6, True)]
-
-aircraft_carrier_safe = \
-    {(2, 2, True), (2, 3, True), (2, 4, True), (2, 5, True), (2, 6, True)}
-aircraft_carrier_after_c2 = \
-    {(2, 2, True), (2, 3, False), (2, 4, True), (2, 5, True), (2, 6, True)}
-
-aircraft_carrier =\
-    {(2, 2): True, (2, 3): True, (2, 4): True, (2, 5): True, (2, 6): True}  # porte_avion en B2
-aircraft_carrier_after_c2 =\
-    {(2, 2): True, (2, 3): False, (2, 4): True, (2, 5): True, (2, 6): True}  # porte_avion en B2
-
-cruiser          = None  # croiseur en A4
-destroyer        = None  # contre_torpilleur en C5
-submarine        = None  # sous_marin en H5
-torpedo_boat     = None  # torpilleur en E9
+# Créez une liste de navires
 ships_list = [aircraft_carrier, cruiser, destroyer, submarine, torpedo_boat]
 
-# l'embryon de notre jeu consiste à demander à l'infini au joueur les coordonnées
-# d'un tir, puis à indiquer si ce tir touche un navire (en mémorisant les conséquences
-# de ce tir, indiquant si le navire est coulé à la suite de plusieurs tirs convergents,
-# et si la partie est finie lorsque le dernier navire est coulé)
+# Fonction pour vérifier si un tir a touché un navire
+def check_hit(x, y):
+    for ship in ships_list:
+        if (x, y) in ship:
+            return True
+    return False
 
-# ... (à compléter)
+# Fonction pour vérifier si un navire est coulé
+def check_ship_sunk(ship):
+    for x, y in ship:
+        if (x, y) in shots:
+            continue
+        else:
+            return False
+    return True
+
+# Liste pour enregistrer les coups tirés
+shots = []
+
+# Fonction pour initialiser et afficher la grille
+def display_grid(grid):
+    # Afficher la ligne supérieure
+    print("+---" * (GRID_SIZE + 1) + "+")
+
+    # Afficher la grille
+    print("|    | " + " | ".join(LETTERS) + " |")
+    print("+---" * (GRID_SIZE + 1) + "+")
+
+    for i, row in enumerate(grid):
+        line = "| " + str(i + 1).rjust(2) + " | " + " | ".join(row) + " |"
+        print(line)
+        print("+---" * (GRID_SIZE + 1) + "+")
+
+# Afficher la grille initiale
+initial_grid = [[Back.BLUE + " " + Back.RESET for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+print("Grille de départ :")
+display_grid(initial_grid)
+
+# Boucle de jeu
+while any(not check_ship_sunk(ship) for ship in ships_list):
+    # Demandez au joueur de saisir des coordonnées
+    try:
+        x = int(input("Entrez le numéro de ligne (1-10) : "))
+        y = LETTERS.index(input("Entrez la lettre de colonne (A-J) : ").upper())
+    except ValueError:
+        print("Coordonnées invalides. Veuillez réessayer.")
+        continue
+    
+    if (x, y) in shots:
+        print("Vous avez déjà tiré ici. Veuillez réessayer.")
+        continue
+    
+    shots.append((x, y))
+    
+    if check_hit(x, y):
+        print(Fore.GREEN + "Vous avez touché un navire !" + Fore.RESET)
+        for ship in ships_list:
+            if (x, y) in ship:
+                if check_ship_sunk(ship):
+                    print(Fore.GREEN + "Vous avez coulé un navire !" + Fore.RESET)
+    else:
+        print(Fore.YELLOW + "Vous êtes tombé dans l'eau." + Fore.RESET)
+    
+    # Mettre à jour la grille en fonction du tir
+    initial_grid[x - 1][y] = Fore.RED + "X" + Fore.RESET if check_hit(x, y) else Fore.BLUE + "o" + Fore.RESET
+    
+    # Afficher la grille après chaque tir
+    print("Grille après votre tir :")
+    display_grid(initial_grid)
+
+# Afficher la grille après la fin du jeu
+print(Fore.GREEN + "Tous les navires ont été coulés. Vous avez gagné !" + Fore.RESET)
