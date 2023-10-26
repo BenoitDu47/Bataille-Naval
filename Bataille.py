@@ -1,6 +1,4 @@
-from colorama import Back, Fore, Style, init
-
-# ip install colorama
+from colorama import Back, Fore, init
 
 # Initialisation de colorama
 init(autoreset=True)
@@ -23,15 +21,13 @@ ships_list = [aircraft_carrier, cruiser, destroyer, submarine, torpedo_boat]
 def check_hit(x, y):
     for ship in ships_list:
         if (x, y) in ship:
-            return True
-    return False
+            return ship
+    return None
 
 # Fonction pour vérifier si un navire est coulé
 def check_ship_sunk(ship):
     for x, y in ship:
-        if (x, y) in shots:
-            continue
-        else:
+        if (x, y) not in shots:
             return False
     return True
 
@@ -62,7 +58,7 @@ while any(not check_ship_sunk(ship) for ship in ships_list):
     # Demandez au joueur de saisir des coordonnées
     try:
         x = int(input("Entrez le numéro de ligne (1-10) : "))
-        y = LETTERS.index(input("Entrez la lettre de colonne (A-J) : ").upper())
+        y = LETTERS.index(input("Entrez la lettre de colonne (A-J) : ").upper()) + 1
     except ValueError:
         print("Coordonnées invalides. Veuillez réessayer.")
         continue
@@ -73,17 +69,17 @@ while any(not check_ship_sunk(ship) for ship in ships_list):
     
     shots.append((x, y))
     
-    if check_hit(x, y):
+    ship_hit = check_hit(x, y)
+    
+    if ship_hit:
         print(Fore.GREEN + "Vous avez touché un navire !" + Fore.RESET)
-        for ship in ships_list:
-            if (x, y) in ship:
-                if check_ship_sunk(ship):
-                    print(Fore.GREEN + "Vous avez coulé un navire !" + Fore.RESET)
+        if check_ship_sunk(ship_hit):
+            print(Fore.GREEN + "Vous avez coulé un navire !" + Fore.RESET)
     else:
         print(Fore.YELLOW + "Vous êtes tombé dans l'eau." + Fore.RESET)
     
     # Mettre à jour la grille en fonction du tir
-    initial_grid[x - 1][y] = Fore.RED + "X" + Fore.RESET if check_hit(x, y) else Fore.BLUE + "o" + Fore.RESET
+    initial_grid[x - 1][y - 1] = Fore.RED + "X" + Fore.RESET if ship_hit else Fore.BLUE + "o" + Fore.RESET
     
     # Afficher la grille après chaque tir
     print("Grille après votre tir :")
